@@ -1,0 +1,7 @@
+tag: v6.1.0
+java: 11
+patches:
+  - patch.diff
+cmds:
+  - ./gradlew --console=plain :distributions:binZip
+output: build/distributions/gradle-6.1-bin.zip
