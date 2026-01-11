@@ -1,0 +1,155 @@
+diff --git a/buildSrc/build.gradle.kts b/buildSrc/build.gradle.kts
+--- a/buildSrc/build.gradle.kts
++++ b/buildSrc/build.gradle.kts
+@@ -88,18 +88,23 @@ allprojects {
+                 excludeModule("com.google.j2objc", "j2objc-annotations")
+             }
+         }
++        mavenCentral()
++        google()
+         maven {
+-            name = "kotlinx"
+-            url = uri("https://dl.bintray.com/kotlin/kotlinx")
+-        }
+-        maven {
+-            name = "kotlin-dev"
+-            url = uri("https://dl.bintray.com/kotlin/kotlin-dev")
+-        }
+-        maven {
+-            name = "kotlin-eap"
+-            url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
++            url = uri("https://groovy.jfrog.io/artifactory/libs-release")
+         }
++        // maven {
++        //     name = "kotlinx"
++        //     url = uri("https://dl.bintray.com/kotlin/kotlinx")
++        // }
++        // maven {
++        //     name = "kotlin-dev"
++        //     url = uri("https://dl.bintray.com/kotlin/kotlin-dev")
++        // }
++        // maven {
++        //     name = "kotlin-eap"
++        //     url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
++        // }
+         maven {
+             name = "ge-release-candidates"
+             url = uri("https://repo.gradle.org/gradle/enterprise-libs-release-candidates-local")
+diff --git a/buildSrc/settings.gradle.kts b/buildSrc/settings.gradle.kts
+--- a/buildSrc/settings.gradle.kts
++++ b/buildSrc/settings.gradle.kts
+@@ -16,10 +16,12 @@
+
+ pluginManagement {
+     repositories {
+-        maven {
+-            name = "kotlin-eap"
+-            url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
+-        }
++        mavenCentral()
++        google()
++        // maven {
++        //     name = "kotlin-eap"
++        //     url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
++        // }
+         gradlePluginPortal()
+     }
+ }
+diff --git a/buildSrc/subprojects/basics/src/main/kotlin/gradlebuild.repositories.gradle.kts b/buildSrc/subprojects/basics/src/main/kotlin/gradlebuild.repositories.gradle.kts
+--- a/buildSrc/subprojects/basics/src/main/kotlin/gradlebuild.repositories.gradle.kts
++++ b/buildSrc/subprojects/basics/src/main/kotlin/gradlebuild.repositories.gradle.kts
+@@ -19,16 +19,18 @@ repositories {
+         name = "Gradle libs"
+         url = uri("https://repo.gradle.org/gradle/libs")
+     }
+-    maven {
+-        name = "kotlinx"
+-        url = uri("https://kotlin.bintray.com/kotlinx/")
+-    }
+-    maven {
+-        name = "kotlin-dev"
+-        url = uri("https://dl.bintray.com/kotlin/kotlin-dev")
+-    }
+-    maven {
+-        name = "kotlin-eap"
+-        url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
+-    }
++    mavenCentral()
++    google()
++    // maven {
++    //     name = "kotlinx"
++    //     url = uri("https://kotlin.bintray.com/kotlinx/")
++    // }
++    // maven {
++    //     name = "kotlin-dev"
++    //     url = uri("https://dl.bintray.com/kotlin/kotlin-dev")
++    // }
++    // maven {
++    //     name = "kotlin-eap"
++    //     url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
++    // }
+ }
+diff --git a/buildSrc/subprojects/dependency-modules/src/main/kotlin/gradlebuild/modules/extension/ExternalModulesExtension.kt b/buildSrc/subprojects/dependency-modules/src/main/kotlin/gradlebuild/modules/extension/ExternalModulesExtension.kt
+--- a/buildSrc/subprojects/dependency-modules/src/main/kotlin/gradlebuild/modules/extension/ExternalModulesExtension.kt
++++ b/buildSrc/subprojects/dependency-modules/src/main/kotlin/gradlebuild/modules/extension/ExternalModulesExtension.kt
+@@ -70,7 +70,7 @@ abstract class ExternalModulesExtension {
+     val jansi = "org.fusesource.jansi:jansi"
+     val jatl = "com.googlecode.jatl:jatl"
+     val jaxb = "com.sun.xml.bind:jaxb-impl"
+-    val jcifs = "org.samba.jcifs:jcifs"
++    val jcifs = "jcifs:jcifs"
+     val jclToSlf4j = "org.slf4j:jcl-over-slf4j"
+     val jcommander = "com.beust:jcommander"
+     val jetbrainsAnnotations = "org.jetbrains:annotations"
+diff --git a/buildSrc/subprojects/jvm/build.gradle.kts b/buildSrc/subprojects/jvm/build.gradle.kts
+--- a/buildSrc/subprojects/jvm/build.gradle.kts
++++ b/buildSrc/subprojects/jvm/build.gradle.kts
+@@ -10,7 +10,8 @@ dependencies {
+     implementation("org.ow2.asm:asm-commons")
+     implementation("com.google.code.gson:gson")
+     implementation("org.gradle:test-retry-gradle-plugin")
+-    implementation("com.gradle.enterprise:test-distribution-gradle-plugin:1.1.2-rc-1")
++    // implementation("com.gradle.enterprise:test-distribution-gradle-plugin:1.1.2-rc-1")
++    implementation("com.gradle.enterprise:test-distribution-gradle-plugin:1.1.2")
+
+     implementation("com.thoughtworks.qdox:qdox") {
+         because("ParameterNamesIndex")
+diff --git a/subprojects/distributions-dependencies/build.gradle.kts b/subprojects/distributions-dependencies/build.gradle.kts
+--- a/subprojects/distributions-dependencies/build.gradle.kts
++++ b/subprojects/distributions-dependencies/build.gradle.kts
+@@ -39,7 +39,8 @@ val jettyVersion = "9.4.31.v20200723"
+ val mavenVersion = "3.0.5"
+ val mavenWagonVersion = "3.0.0"
+ val nativePlatformVersion = "0.22-milestone-9"
+-val pmavenVersion = "0.8-20100325"
++// val pmavenVersion = "0.8-20100325"
++val pmavenVersion = "0.7"
+ val slf4jVersion = "1.7.28"
+ val sshdVersion = "2.0.0"
+ val tomljVersion = "1.0.0"
+diff --git a/subprojects/messaging/src/main/java/org/gradle/internal/remote/internal/inet/InetAddresses.java b/subprojects/messaging/src/main/java/org/gradle/internal/remote/internal/inet/InetAddresses.java
+--- a/subprojects/messaging/src/main/java/org/gradle/internal/remote/internal/inet/InetAddresses.java
++++ b/subprojects/messaging/src/main/java/org/gradle/internal/remote/internal/inet/InetAddresses.java
+@@ -30,7 +30,6 @@
+  * Provides some information about the network addresses of the local machine.
+  */
+ class InetAddresses {
+-    private static final int REACHABLE_TIMEOUT_MS = 50;
+     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+     private final List<InetAddress> loopback = new ArrayList<InetAddress>();
+@@ -60,12 +59,8 @@ private void analyzeNetworkInterface(NetworkInterface networkInterface) {
+                 InetAddress candidate = candidates.nextElement();
+                 if (isLoopbackInterface) {
+                     if (candidate.isLoopbackAddress()) {
+-                        if (candidate.isReachable(REACHABLE_TIMEOUT_MS)) {
+-                            logger.debug("Adding loopback address {}", candidate);
+-                            loopback.add(candidate);
+-                        } else {
+-                            logger.debug("Ignoring unreachable local address on loopback interface {}", candidate);
+-                        }
++                        logger.debug("Adding loopback address {}", candidate);
++                        loopback.add(candidate);
+                     } else {
+                         logger.debug("Ignoring remote address on loopback interface {}", candidate);
+                     }

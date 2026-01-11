@@ -1,0 +1,11 @@
+tag: v6.7.1
+java: 11
+patches:
+  - patch.diff
+cmds:
+  - |
+    ./gradlew --console=plain
+    -PfinalRelease=true
+    --dependency-verification=off
+    :distributions-full:binDistributionZip
+output: subprojects/distributions-full/build/distributions/gradle-6.7.1-bin.zip

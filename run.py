@@ -92,39 +92,31 @@ def build(version: str) -> int:
         result = subprocess.run(
             args=args,
             cwd="gradle",
-            # env=patch_env({"JAVA_HOME": os.environ[f"JAVA_HOME_{config['java']}_X64"]}),
+            env=patch_env({
+                "IGNORE_MIRROR": "true",
+                # "JAVA_HOME": os.environ[f"JAVA_HOME_{config['java']}_X64"]
+            }),
         )
         if result.returncode != 0:
             logger.error("Failed while running %s", args)
             return 1
 
+    subprocess.run(
+        args=["find", "build", "-type", "f"],
+        cwd="gradle",
+        check=True,
+    )
+
     if result.returncode == 0:
-        if not os.path.isdir("gradle"):
-            logger.error("Cannot find gradle")
-        elif not os.path.isdir("gradle/build"):
-            logger.error("Cannot find gradle/build")
-        elif not os.path.isdir("gradle/build/distributions"):
-            logger.error("Cannot find gradle/build/distributions")
-
-        logger.info(
-            "Found the following files in gradle/build/distributions: %s",
-            list(Path("gradle").rglob("build/distributions/*")),
-        )
-
-        logger.info(
-            "Found the following bin.zip files: %s",
-            list(Path("gradle").rglob("*-bin.zip")),
-        )
-
-        filename = os.path.basename(config["output"])
-        shutil.copy2(
-            os.path.join("gradle", config["output"]),
-            os.path.join("distributions", filename),
-        )
-        logger.info("Copied %s", filename)
+        logger.info("Successfully built version '%s'.", version)
+        output_file = os.path.join("gradle", config["output"])
+        logger.info("Output file is '%s'", output_file)
+        os.makedirs("output", exist_ok=True)
+        shutil.copy2(output_file, "output")
+        logger.info("Copied %s to output/", output_file)
         return 0
     else:
-        logger.error("Cannot build %s", version)
+        logger.error("Failed to build version '%s'.", version)
         return 1
 
 
@@ -140,8 +132,6 @@ def main():
 
     configure_logging(args.verbose)
 
-    os.makedirs("distributions", exist_ok=True)
-
     if not os.path.isdir("gradle"):
         result = subprocess.run(
             args=[
@@ -155,7 +145,17 @@ def main():
     else:
         logger.info("The gradle repository has been cloned already.")
 
-    return build("v6.1.0")
+    results = {}
+    with os.scandir('patches') as entries:
+        gradle_versions = sorted(entry.name for entry in entries if entry.is_dir())
+        for ver in gradle_versions:
+            results[ver] = build(ver)
+
+    rc = 0
+    for ver, res in results.items():
+        rc |= res
+        logger.info("'%s': %s", ver, "SUCCESS" if res == 0 else "FAILURE")
+    return rc
 
 
 if __name__ == "__main__":
